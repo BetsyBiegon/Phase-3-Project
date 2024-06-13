@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy.orm import relationship
 from database import Base, session
 
 class Book(Base):
@@ -6,11 +7,12 @@ class Book(Base):
 
     id = Column(Integer, primary_key=True)
     title = Column(String)
-    author = Column(String)
+    author_id = Column(Integer, ForeignKey('authors.id'))
+    author = relationship('Author', back_populates='books')
 
     @staticmethod
-    def create(title, author):
-        new_book = Book(title=title, author=author)
+    def create(title, author_id):
+        new_book = Book(title=title, author_id=author_id)
         session.add(new_book)
         session.commit()
         return new_book

@@ -1,5 +1,5 @@
 import click
-from models import Book
+from models import Book, Author
 
 @click.group()
 def cli():
@@ -10,7 +10,9 @@ def list_books():
     """Displays a list of all books in the library."""
     books = Book.get_all()
     for book in books:
-        print(f"{book.id}: {book.title} by {book.author}")
+        author_name = "Unknown" if book.author is None else book.author.name
+        print(f"{book.id}: {book.title} by {author_name}")
+
 
 @click.command()
 @click.option('--title', prompt='Title', help='The title of the book')
@@ -35,7 +37,7 @@ def find_book(id):
     """Allows the user to find a book by its ID."""
     book = Book.find_by_id(id)
     if book:
-        print(f"Book found: {book.id}: {book.title} by {book.author}")
+        print(f"Book found: {book.id}: {book.title} by {book.author.name}")
     else:
         print(f"Book with ID {id} not found.")
 

@@ -1,48 +1,54 @@
-from database import engine, Base
+from database import engine, Base, session
 from models.books import Book
-from sqlalchemy.orm import sessionmaker
+from models.author import Author
+from sqlalchemy.exc import OperationalError
+from sqlalchemy.sql import text
+
+# Add the author_id column if it doesn't exist
+def add_author_id_column():
+    with engine.connect() as conn:
+        try:
+            conn.execute(text("ALTER TABLE books ADD COLUMN author_id INTEGER REFERENCES authors(id)"))
+            print("Added author_id column to books table.")
+        except OperationalError as e:
+            if "duplicate column name" in str(e):
+                print("author_id column already exists.")
+            else:
+                raise
 
 # Create the database tables
 Base.metadata.create_all(engine)
 
-# Initialize the session
-Session = sessionmaker(bind=engine)
-session = Session()
+# Add the new column to the existing table
+add_author_id_column()
 
-# Adding sample books
-books = [
-    Book(title="To Kill a Mockingbird", author="Harper Lee"),
-    Book(title="1984", author="George Orwell"),
-    Book(title="The Great Gatsby", author="F. Scott Fitzgerald"),
-    Book(title="The Catcher in the Rye", author="J.D. Salinger"),
-    Book(title="The Hobbit", author="J.R.R. Tolkien"),
-    Book(title="Fahrenheit 451", author="Ray Bradbury"),
-    Book(title="Moby Dick", author="Herman Melville"),
-    Book(title="Pride and Prejudice", author="Jane Austen"),
-    Book(title="War and Peace", author="Leo Tolstoy"),
-    Book(title="Crime and Punishment", author="Fyodor Dostoevsky"),
-    Book(title="The Brothers Karamazov", author="Fyodor Dostoevsky"),
-    Book(title="Brave New World", author="Aldous Huxley"),
-    Book(title="The Odyssey", author="Homer"),
-    Book(title="The Divine Comedy", author="Dante Alighieri"),
-    Book(title="Don Quixote", author="Miguel de Cervantes"),
-    Book(title="A song of ice and fire", author="George R.R. Martin"),
-    Book(title="The Lord of the Rings", author="J.R.R. Tolkien"),
-    Book(title="The Adventures of Huckleberry Finn", author="Mark Twain"),
-    Book(title="The Harry Potter", author="J.K. Rowling"),
-    Book(title="The Chronicles of Narnia", author="J.K. Rowling"),
-    Book(title="The Lion, the Witch, and the Wardrobe", author="J.K. Rowling"),
-    Book(title="Fifty Shades of Grey", author="E.L. James"),
-    Book(title="Fifty Shades Darker", author="E.L. James"),
-    Book(title="Fifty Shades Freed", author="E.L. James"),
-    Book(title="The Da Vinci Code", author="Dan Brown"),
-    Book(title="The Alchemist", author="Paulo Coelho"),
-    Book(title="The Girl with the Dragon Tattoo", author="Harper Lee"),
+# Adding sample authors and books
+authors_books = {
+    "Harper Lee": ["To Kill a Mockingbird"],
+    "George Orwell": ["1984"],
+    "F. Scott Fitzgerald": ["The Great Gatsby"],
+    "J.D. Salinger": ["The Catcher in the Rye"],
+    "J.R.R. Tolkien": ["The Hobbit", "The Lord of the Rings"],
+    "Ray Bradbury": ["Fahrenheit 451"],
+    "Herman Melville": ["Moby Dick"],
+    "Jane Austen": ["Pride and Prejudice"],
+    "Leo Tolstoy": ["War and Peace"],
+    "Fyodor Dostoevsky": ["Crime and Punishment", "The Brothers Karamazov"],
+    "Aldous Huxley": ["Brave New World"],
+    "Homer": ["The Odyssey"],
+    "Dante Alighieri": ["The Divine Comedy"],
+    "Miguel de Cervantes": ["Don Quixote"],
+    "George R.R. Martin": ["A Song of Ice and Fire"],
+    "Mark Twain": ["The Adventures of Huckleberry Finn"],
+    "J.K. Rowling": ["Harry Potter series"],
+    "E.L. James": ["Fifty Shades of Grey", "Fifty Shades Darker", "Fifty Shades Freed"],
+    "Dan Brown": ["The Da Vinci Code"],
+    "Paulo Coelho": ["The Alchemist"],
+}
 
-]
+for author_name, books in authors_books.items():
+    author = Author.create(author_name)
+    for book_title in books:
+        Book.create(book_title, author.id)
 
-# Add the books to the session and commit
-session.add_all(books)
-session.commit()
-
-print("Database initialized with sample books!")
+print("Database initialized with sample authors and books!")
