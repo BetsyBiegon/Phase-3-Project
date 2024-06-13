@@ -3,7 +3,7 @@
 
 ## Description
 
-This is a simple library management system implemented in Python. It allows users to manage books through a command-line interface (CLI). The system uses SQLAlchemy for ORM to interact with a SQLite database.
+This is a simple library management system implemented in Python. It allows users to manage books through a command-line interface (CLI). 
 
 ## Functionalities
 
@@ -50,5 +50,5 @@ To find a book by ID;
 `python cli/main.py find-book`
 
 
-   ###### ~by Betsy Biegon~
+   ##### ~by Betsy Biegon~
 
