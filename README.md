@@ -50,5 +50,5 @@ To find a book by ID;
 `python cli/main.py find-book`
 
 
-   ## ~by Betsy Biegon~
+   ###### ~by Betsy Biegon~
 
